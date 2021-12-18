@@ -77,8 +77,8 @@
 #define E_l	count
 #define E_h	tmp1
 
-/* All memmoves up to 96 bytes are done by memcpy as it supports overlaps.
-   Larger backwards copies are also handled by memcpy. The only remaining
+/* All memmoves up to 96 bytes are done by __memcpy as it supports overlaps.
+   Larger backwards copies are also handled by __memcpy. The only remaining
    case is forward large copies.  The destination is aligned, and an
    unrolled loop processes 64 bytes per iteration.
 */
@@ -87,7 +87,7 @@
 ENTRY(wmemmove)
 	lsl	count, count, #2
 #else
-ENTRY(memmove_generic)
+ENTRY(memmove)
 #endif
 	sub	tmp1, dstin, src
 	cmp	count, 96
@@ -149,9 +149,5 @@ ENTRY(memmove_generic)
 #if defined(WMEMMOVE)
 END(wmemmove)
 #else
-END(memmove_generic)
-
-ALIAS_SYMBOL(memcpy_generic, memmove_generic)
+END(memmove)
 #endif
-
-NOTE_GNU_PROPERTY()

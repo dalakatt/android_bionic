@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,15 @@
 
 #include <private/bionic_asm.h>
 
-#define FUNCTION_DELEGATE(name, impl) \
-ENTRY(name); \
-    b impl; \
-END(name)
+ENTRY(__memcpy_chk)
+  cmp x2, x3
+  bls memcpy
 
-FUNCTION_DELEGATE(memchr, __memchr_aarch64_mte)
-FUNCTION_DELEGATE(stpcpy, __stpcpy_aarch64_mte)
-FUNCTION_DELEGATE(strchr, __strchr_aarch64_mte)
-FUNCTION_DELEGATE(strchrnul, __strchrnul_aarch64_mte)
-FUNCTION_DELEGATE(strcmp, __strcmp_aarch64_mte)
-FUNCTION_DELEGATE(strcpy, __strcpy_aarch64_mte)
-FUNCTION_DELEGATE(strlen, __strlen_aarch64_mte)
-FUNCTION_DELEGATE(strrchr, __strrchr_aarch64_mte)
-FUNCTION_DELEGATE(strncmp, __strncmp_aarch64_mte)
-FUNCTION_DELEGATE(memcpy, memcpy_generic)
-FUNCTION_DELEGATE(memmove, memmove_generic)
+  // Preserve for accurate backtrace.
+  stp x29, x30, [sp, -16]!
+  .cfi_def_cfa_offset 16
+  .cfi_rel_offset x29, 0
+  .cfi_rel_offset x30, 8
 
-NOTE_GNU_PROPERTY()
+  bl __memcpy_chk_fail
+END(__memcpy_chk)
